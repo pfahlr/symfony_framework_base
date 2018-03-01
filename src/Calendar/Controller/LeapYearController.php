@@ -15,4 +15,5 @@ class LeapYearController
     }
     return new Response('No, not a leap year');
   }
+  public function testAction($blank, $year) {}
 }
