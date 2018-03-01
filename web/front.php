@@ -8,10 +8,16 @@ use Symfony\Component\Routing;
 use Symfony\Component\HttpKernel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-use Simplex;
+//use Simplex;
 
 //gets the request object from php globals
-$request = Request::createFromGlobals();
+if(!isset($argv[0])) {
+    $request = Request::createFromGlobals();
+}
+//or use the cli
+else {
+    $request = Request::create(isset($argv[1]) ? $argv[1]:'/is_leap_year/2012');
+}
 //even dispatcher object allows binding of events (required (addListener) or not (addSubscriber))
 $dispatcher = new EventDispatcher();
 //$dispatcher->addListener('response', [new Simplex\GoogleListener(),'onResponse']);
@@ -31,9 +37,17 @@ $argumentResolver = new HttpKernel\Controller\ArgumentResolver();
 
 //instatiate the framework
 $framework = new Simplex\Framework($dispatcher, $matcher, $controllerResolver, $argumentResolver);
+$framework = new HttpKernel\HttpCache\HttpCache(
+    $framework,
+    new HttpKernel\HttpCache\Store(__DIR__.'/../cache'),
+    new HttpKernel\HttpCache\Esi(),
+    array('debug'=>true)
+);
 
 //main request handling function in the front controller
 $response = $framework->handle($request);
+
+if(isset($argv[0])) var_dump($response);
 
 //send the response the client
 $response->send();
