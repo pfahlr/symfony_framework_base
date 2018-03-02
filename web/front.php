@@ -45,6 +45,7 @@ $dispatcher->addSubscriber(new HttpKernel\EventListener\ExceptionListener(
 ));
 $dispatcher->addSubscriber(new HttpKernel\EventListener\ResponseListener('UTF-8'));
 $dispatcher->addSubscriber(new HttpKernel\EventListener\StreamedResponseListener());
+$dispatcher->addSubscriber(new Simplex\StringResponseListener());
 
 //instatiate the framework
 $framework = new Simplex\Framework($dispatcher, $controllerResolver, $requestStack, $argumentResolver);
