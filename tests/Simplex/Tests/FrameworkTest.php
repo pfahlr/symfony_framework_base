@@ -2,6 +2,7 @@
 // example.com/tests/Simplex/Tests/FrameworkTest.php
 namespace Simplex\Tests;
 
+use Calendar\Controller\LeapYearController;
 use PHPUnit\Framework\TestCase;
 use Simplex\Framework;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,6 +19,14 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class FrameworkTest extends TestCase
 {
+
+    public function testLeapYear() {
+        $leapYear = new LeapYearController();
+        $this->assertContains('Yes', $leapYear->indexAction(2012)->getContent());
+        $this->assertContains('No', $leapYear->indexAction(2013)->getContent());
+    }
+
+    /*
     public function testNotFoundHandling()
     {
         $framework = $this->getFrameworkForException(new ResourceNotFoundException());
@@ -87,4 +96,5 @@ class FrameworkTest extends TestCase
         $eventDispatcher = $this->createMock(EventDispatcher::class);
         return new Framework($eventDispatcher, $matcher, $controllerResolver, $argumentResolver);
     }
+    */
 }

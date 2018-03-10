@@ -2,6 +2,8 @@
 namespace Calendar\Controller;
 
 use Calendar\Model\LeapYear;
+use Symfony\Component\HttpFoundation\Response;
+
 
 class LeapYearController
 {
@@ -9,7 +11,7 @@ class LeapYearController
   {
     $leapYear = new LeapYear();
     if($leapYear->is_leap_year($year)) {
-      $response = 'Yes, this is a leap year CACHE:'.rand();
+      $response = new Response('Yes, this is a leap year CACHE:'.rand());
     }
     else {
       $response = new Response('No, not a leap year CACHE:'.rand());
