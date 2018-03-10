@@ -3,8 +3,14 @@
 namespace Simplex\Tests;
 
 use Calendar\Controller\LeapYearController;
+use Calendar\Model\LeapYear;
 use PHPUnit\Framework\TestCase;
+use Simplex\ContentLengthListener;
+use Simplex\StringResponseListener;
 use Simplex\Framework;
+use Simplex\GoogleListener;
+use Simplex\ResponseEvent;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
@@ -24,6 +30,64 @@ class FrameworkTest extends TestCase
         $leapYear = new LeapYearController();
         $this->assertContains('Yes', $leapYear->indexAction(2012)->getContent());
         $this->assertContains('No', $leapYear->indexAction(2013)->getContent());
+        $this->assertEquals(
+            substr($leapYear->indexAction(date('Y'))->getContent(),0,7),
+            substr($leapYear->indexAction(null)->getContent(),0,7)
+        );
+
+        $this->assertContains('This is some other content', $leapYear->testAction('',''));
+
+        $leapYear = new LeapYear();
+        $this->assertEquals(true, $leapYear->is_leap_year(2012));
+        $this->assertEquals(false, $leapYear->is_leap_year(2013));
+    }
+
+    public function testGoogleListener() {
+
+        $request = new Request();
+        $response = new Response();
+
+        $responseEvent = new ResponseEvent($response, $request);
+
+        $googleListener = new GoogleListener();
+
+        $googleListener->onResponse($responseEvent);
+
+        $this->assertArrayHasKey('response', $googleListener->getSubscribedEvents());
+
+        $this->assertContains('GA CODE', $response->getContent());
+    }
+
+    public function testContentLengthListener(){
+
+        $request = new Request();
+        $response = new Response('123');
+
+        $responseEvent = new ResponseEvent($response, $request);
+
+        $contentLengthListener = new ContentLengthListener();
+
+        $contentLengthListener->onResponse($responseEvent);
+
+        $this->assertArrayHasKey('response',$contentLengthListener->getSubscribedEvents());
+
+        $this->assertEquals('3', $response->headers->get('Content-Length'));
+
+    }
+
+    public function testStringResponseListener() {
+        $event = $this->createMock(\Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent::class);
+
+        $event
+            ->expects($this->once())
+            ->method('getControllerResult')
+            ->will($this->returnValue('Lorem Ipsum'));
+
+        $strResponseListener = new StringResponseListener();
+        $strResponseListener->onView($event);
+
+        $this->assertArrayHasKey('kernel.view',$strResponseListener->getSubscribedEvents());
+
     }
 
     /*
