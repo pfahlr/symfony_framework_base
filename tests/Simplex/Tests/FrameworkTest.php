@@ -22,7 +22,7 @@ class FrameworkTest extends TestCase
 
     public function testLeapYear() {
         $leapYear = new LeapYearController();
-        $this->assertContains('No', $leapYear->indexAction(2012)->getContent());
+        $this->assertContains('Yes', $leapYear->indexAction(2012)->getContent());
         $this->assertContains('No', $leapYear->indexAction(2013)->getContent());
     }
 
